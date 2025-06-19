@@ -1,0 +1,67 @@
+import { useState } from "react"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/AppSidebar"
+import { Header } from "@/components/Header"
+// import { StatsCards } from "@/components/StatsCards"
+// import { MemberManagement } from "@/components/MemberManagement"
+// import { StaffManagement } from "@/components/StaffManagement"
+// import { EquipmentTracking } from "@/components/EquipmentTracking"
+// import { Analytics } from "@/components/Analytics"
+// import { NotificationsPanel } from "@/components/NotificationsPanel"
+//import utils from "../../lib/utils";
+
+const Index = () => {
+  const [activeTab, setActiveTab] = useState("dashboard")
+  const [darkMode, setDarkMode] = useState(false)
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode)
+    document.documentElement.classList.toggle("dark")
+  }
+
+//   const renderContent = () => {
+//     switch (activeTab) {
+//       case "members":
+//         return <MemberManagement />
+//       case "staff":
+//         return <StaffManagement />
+//       case "equipment":
+//         return <EquipmentTracking />
+//       case "analytics":
+//         return <Analytics />
+//       default:
+//         return (
+//           <div className="space-y-6">
+//             <StatsCards />
+//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+//               <div className="lg:col-span-2">
+//                 <Analytics />
+//               </div>
+//               <div>
+//                 <NotificationsPanel />
+//               </div>
+//             </div>
+//           </div>
+//         )
+//     }
+//   }
+
+  return (
+    <div >
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+          <AppSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <main className="flex-1 overflow-auto">
+            <Header
+              darkMode={darkMode}
+              toggleDarkMode={toggleDarkMode}
+            />
+            {/* <div className="p-6">{renderContent()}</div> */}
+          </main>
+        </div>
+      </SidebarProvider>
+    </div>
+  )
+}
+
+export default Index
