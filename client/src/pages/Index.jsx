@@ -2,12 +2,12 @@ import { useState } from "react"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar"
 import { Header } from "@/components/Header"
-// import { StatsCards } from "@/components/StatsCards"
+import { StatsCard } from "@/components/StatsCard"
 // import { MemberManagement } from "@/components/MemberManagement"
 // import { StaffManagement } from "@/components/StaffManagement"
 // import { EquipmentTracking } from "@/components/EquipmentTracking"
-// import { Analytics } from "@/components/Analytics"
-// import { NotificationsPanel } from "@/components/NotificationsPanel"
+import { Analytics } from "@/components/Analytics"
+import { NotificationsPanel } from "@/components/NotificationsPanel"
 //import utils from "../../lib/utils";
 
 const Index = () => {
@@ -19,32 +19,29 @@ const Index = () => {
     document.documentElement.classList.toggle("dark")
   }
 
-//   const renderContent = () => {
-//     switch (activeTab) {
-//       case "members":
-//         return <MemberManagement />
-//       case "staff":
-//         return <StaffManagement />
-//       case "equipment":
-//         return <EquipmentTracking />
-//       case "analytics":
-//         return <Analytics />
-//       default:
-//         return (
-//           <div className="space-y-6">
-//             <StatsCards />
-//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-//               <div className="lg:col-span-2">
-//                 <Analytics />
-//               </div>
-//               <div>
-//                 <NotificationsPanel />
-//               </div>
-//             </div>
-//           </div>
-//         )
-//     }
-//   }
+  const renderContent = () => {
+    switch (activeTab) {
+      // case "members":
+      //   return <MemberManagement />
+      // case "staff":
+      //   return <StaffManagement />
+      // case "equipment":
+      //   return <EquipmentTracking />
+      case "analytics":
+       return <Analytics />
+      case "notifications":
+       return <NotificationsPanel />
+      default:
+        return (
+          <div className="space-y-6">
+            <StatsCard />
+            <div className="w-full grid gap-6">
+                <Analytics />
+            </div>
+          </div>
+        )
+    }
+  }
 
   return (
     <div >
@@ -56,7 +53,7 @@ const Index = () => {
               darkMode={darkMode}
               toggleDarkMode={toggleDarkMode}
             />
-            {/* <div className="p-6">{renderContent()}</div> */}
+            <div className="p-6">{renderContent()}</div>
           </main>
         </div>
       </SidebarProvider>

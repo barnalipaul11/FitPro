@@ -3,7 +3,8 @@ import {
   UserCheck,
   Dumbbell,
   BarChart3,
-  LayoutDashboard
+  LayoutDashboard,
+  Bell
 } from "lucide-react"
 import {
   Sidebar,
@@ -23,7 +24,8 @@ const menuItems = [
   { title: "Members", icon: Users, key: "members" },
   { title: "Staff", icon: UserCheck, key: "staff" },
   { title: "Equipment", icon: Dumbbell, key: "equipment" },
-  { title: "Analytics", icon: BarChart3, key: "analytics" }
+  { title: "Analytics", icon: BarChart3, key: "analytics" },
+  { title: "Notification", icon: Bell, key: "notifications" },
 ]
 
 export function AppSidebar({ activeTab, setActiveTab }) {
