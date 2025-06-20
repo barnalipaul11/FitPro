@@ -3,8 +3,8 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar"
 import { Header } from "@/components/Header"
 import { StatsCard } from "@/components/StatsCard"
-// import { MemberManagement } from "@/components/MemberManagement"
-// import { StaffManagement } from "@/components/StaffManagement"
+import { MemberManagement } from "@/components/MemberManagement"
+import { StaffManagement } from "@/components/StaffManagement"
 // import { EquipmentTracking } from "@/components/EquipmentTracking"
 import { Analytics } from "@/components/Analytics"
 import { NotificationsPanel } from "@/components/NotificationsPanel"
@@ -21,10 +21,10 @@ const Index = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      // case "members":
-      //   return <MemberManagement />
-      // case "staff":
-      //   return <StaffManagement />
+       case "members":
+         return <MemberManagement />
+       case "staff":
+          return <StaffManagement />
       // case "equipment":
       //   return <EquipmentTracking />
       case "analytics":
