@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar"
+import { MemberManagement } from "@/components/MemberManagement"
 import { Header } from "@/components/Header"
-import { EquipmentTracking } from "@/components/EquipmentTracking"
-const Equipments = () => {
+const Members = () => {
 
     const [darkMode, setDarkMode] = useState(false)
 
@@ -23,7 +23,7 @@ const Equipments = () => {
                             toggleDarkMode={toggleDarkMode}
                         />
                         <div className="p-6">
-                            <EquipmentTracking />
+                            <MemberManagement />
                         </div>
                     </main>
                 </div>
@@ -33,4 +33,4 @@ const Equipments = () => {
 }
 
 
-export default Equipments
+export default Members

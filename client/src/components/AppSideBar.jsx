@@ -18,17 +18,19 @@ import {
   SidebarHeader,
   SidebarFooter
 } from "@/components/ui/sidebar"
+import { useNavigate } from "react-router-dom"; // Adjust import path as necessary
 
 const menuItems = [
-  { title: "Dashboard", icon: LayoutDashboard, key: "dashboard" },
-  { title: "Members", icon: Users, key: "members" },
-  { title: "Staff", icon: UserCheck, key: "staff" },
-  { title: "Equipment", icon: Dumbbell, key: "equipment" },
-  { title: "Analytics", icon: BarChart3, key: "analytics" },
-  { title: "Notification", icon: Bell, key: "notifications" },
+  { title: "Dashboard", icon: LayoutDashboard, key: "/" },
+  { title: "Members", icon: Users, key: "/member" },
+  { title: "Staff", icon: UserCheck, key: "/staff" },
+  { title: "Equipment", icon: Dumbbell, key: "/equipment" },
+  { title: "Analytics", icon: BarChart3, key: "/info" },
+  { title: "Notification", icon: Bell, key: "/notifications" },
 ]
 
 export function AppSidebar({ activeTab, setActiveTab }) {
+   const navigate = useNavigate();
   return (
     <Sidebar className="border-r border-slate-200 dark:border-slate-700">
       <SidebarHeader className="p-6">
@@ -57,12 +59,8 @@ export function AppSidebar({ activeTab, setActiveTab }) {
               {menuItems.map(item => (
                 <SidebarMenuItem key={item.key}>
                   <SidebarMenuButton
-                    onClick={() => setActiveTab(item.key)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      activeTab === item.key
-                        ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg"
-                        : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    }`}
+                    onClick={() => navigate(item.key)}
+                    className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
                     <item.icon className="w-5 h-5" />
                     <span className="font-medium">{item.title}</span>
