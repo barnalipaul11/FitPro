@@ -17,6 +17,16 @@ app.use(cors({
     origin: process.env.FRONTEND_URL,
     credentials: true
 }))
-app.get('/', (req, res) => {
-    res.send('Hello from backend')
+
+
+mongoose.connect(process.env.MONGODB_CONN,{dbName:'gym-website'})
+    .then(()=>console.log('Database connected'))
+    .catch(err=>console.log(err))
+
+
+
+
+    
+app.listen(PORT,()=>{
+    console.log('Server running on port:',PORT)
 })
