@@ -5,7 +5,11 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import staffRoutes from './routes/Staff.route.js';
 
-dotenv.config();
+dotenv.config({
+    path : ".env"
+})
+
+
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -28,3 +32,13 @@ mongoose.connect(process.env.MONGODB_CONN, { dbName: 'gym-website' })
 app.listen(PORT, () => {
   console.log("Server running on port:", PORT);
 });
+
+app.use((err, req, res, next) => { 
+    console.error(err.stack);
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
+        message: err.message || 'Internal Server Error',
+        error: process.env.NODE_ENV === 'development' ? err : {}
+    });
+}
+);
