@@ -5,9 +5,10 @@ import { Header } from "@/components/Header"
 import { StatsCard } from "@/components/StatsCard"
 import { MemberManagement } from "@/components/MemberManagement"
 import { StaffManagement } from "@/components/StaffManagement"
-// import { EquipmentTracking } from "@/components/EquipmentTracking"
+
 import { Analytics } from "@/components/Analytics"
 import { NotificationsPanel } from "@/components/NotificationsPanel"
+import { EquipmentTracking } from "@/components/EquipmentTracking"
 //import utils from "../../lib/utils";
 
 const Index = () => {
@@ -25,8 +26,8 @@ const Index = () => {
          return <MemberManagement />
        case "staff":
           return <StaffManagement />
-      // case "equipment":
-      //   return <EquipmentTracking />
+      case "equipment":
+         return <EquipmentTracking />
       case "analytics":
        return <Analytics />
       case "notifications":
