@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import mongoose from 'mongoose'
-
+import MemberRoute from './routes/member.route.js'
 dotenv.config({
     path : ".env"
 })
@@ -24,9 +24,19 @@ mongoose.connect(process.env.MONGODB_CONN,{dbName:'gym-website'})
     .catch(err=>console.log(err))
 
 
-
+app.use('/api/members', MemberRoute)
 
     
 app.listen(PORT,()=>{
     console.log('Server running on port:',PORT)
 })
+
+app.use((err, req, res, next) => { 
+    console.error(err.stack);
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
+        message: err.message || 'Internal Server Error',
+        error: process.env.NODE_ENV === 'development' ? err : {}
+    });
+}
+);

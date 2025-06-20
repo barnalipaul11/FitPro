@@ -32,7 +32,7 @@ const memberSchema = z.object({
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   subscription: z.string().min(1, "Please select a subscription type"),
   status: z.string().min(1, "Please select a status"),
-  dueDate: z.string().min(1, "Due date is required")
+  dueDate: z.string().min(1, "Start date is required")
 })
 
 export function MemberForm({ open, onOpenChange }) {
@@ -126,8 +126,9 @@ export function MemberForm({ open, onOpenChange }) {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="Basic">Basic</SelectItem>
-                      <SelectItem value="Premium">Premium</SelectItem>
-                      <SelectItem value="VIP">VIP</SelectItem>
+                      <SelectItem value="Silver">Silver</SelectItem>
+                      <SelectItem value="Gold">Gold</SelectItem>
+                      <SelectItem value="Platinum">Platinum</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -135,7 +136,7 @@ export function MemberForm({ open, onOpenChange }) {
               )}
             />
 
-            <FormField
+            {/* <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
@@ -161,14 +162,14 @@ export function MemberForm({ open, onOpenChange }) {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
 
             <FormField
               control={form.control}
               name="dueDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Due Date</FormLabel>
+                  <FormLabel>Start Date</FormLabel>
                   <FormControl>
                     <Input type="date" {...field} />
                   </FormControl>
