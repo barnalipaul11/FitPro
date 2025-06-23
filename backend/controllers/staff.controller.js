@@ -1,12 +1,15 @@
 import Staff from "../models/Staff.model.js";
-
+import mongoose from "mongoose";
 
 // Create Staff
 export const createStaff = async (req, res) => {
+  
   try {
     const newStaff = await Staff.create(req.body);
+    console.log("New Staff Created:", newStaff);
     res.status(201).json(newStaff);
   } catch (err) {
+    console.error("Error while creating staff:", err);
     res.status(400).json({ error: err.message });
   }
 };
