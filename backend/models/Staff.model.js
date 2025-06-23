@@ -1,14 +1,8 @@
 import mongoose from "mongoose";
 
 const staffSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  phone: {
-    type: String,
-    required: true,
-  },
+  name: { type: String, required: true },
+  phone: { type: String, required: true },
   role: {
     type: String,
     enum: ["Personal Trainer", "Admin", "Manager", "Receptionist"],
@@ -18,10 +12,7 @@ const staffSchema = new mongoose.Schema({
     start: { type: String, required: true },
     end: { type: String, required: true },
   },
-  salary: {
-    type: Number,
-    required: true,
-  },
+  salary: { type: Number, required: true },
   status: {
     type: String,
     enum: ["Active", "Inactive"],
@@ -29,4 +20,5 @@ const staffSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Staff", staffSchema);
+const Staff = mongoose.model("Staff", staffSchema);
+export default Staff;
