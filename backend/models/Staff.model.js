@@ -5,7 +5,7 @@ const staffSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   role: {
     type: String,
-    enum: ["Personal Trainer", "Admin", "Manager", "Receptionist"],
+    enum: ["Personal Trainer", "Yoga Trainer","Nutritionist","Maintenance", "Gym Manager", "Receptionist"],
     required: true,
   },
   shift: {
@@ -15,7 +15,7 @@ const staffSchema = new mongoose.Schema({
   salary: { type: Number, required: true },
   status: {
     type: String,
-    enum: ["Active", "Inactive"],
+    enum: ["Active", "Inactive","On Leave"],
     default: "Active",
   },
 }, { timestamps: true });
