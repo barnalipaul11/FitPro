@@ -33,7 +33,6 @@ const equipmentSchema = z.object({
   location: z.string().min(1, "Location is required"),
   status: z.string().min(1, "Please select a status"),
   lastMaintenance: z.string().min(1, "Last maintenance date is required"),
-  nextMaintenance: z.string().min(1, "Next maintenance date is required"),
   notes: z.string().optional()
 })
 
@@ -46,7 +45,6 @@ export function EquipmentForm({ open, onOpenChange }) {
       location: "",
       status: "",
       lastMaintenance: "",
-      nextMaintenance: "",
       notes: ""
     }
   })
@@ -151,7 +149,7 @@ export function EquipmentForm({ open, onOpenChange }) {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="lastMaintenance"
@@ -166,7 +164,7 @@ export function EquipmentForm({ open, onOpenChange }) {
                 )}
               />
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="nextMaintenance"
                 render={({ field }) => (
@@ -178,7 +176,7 @@ export function EquipmentForm({ open, onOpenChange }) {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
 
             <FormField
