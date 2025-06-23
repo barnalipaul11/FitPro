@@ -52,7 +52,7 @@ export function StaffForm({ open, onOpenChange }) {
 
   const onSubmit = async (data) => {
     try {
-      await createStaff(data)
+      await createStaff(data) 
 
       // toast.success("Staff member added successfully!");
       form.reset()

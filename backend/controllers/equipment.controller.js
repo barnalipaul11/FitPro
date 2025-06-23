@@ -1,5 +1,5 @@
-import Equipment from "../models/Equipment.model";
-import { handleError } from "../helpers/handleError";
+import Equipment from "../models/Equipment.model.js";
+import { handleError } from "../helpers/handleError.js";
 import { validationResult, body, param } from "express-validator";  
 import mongoose from "mongoose";
 
