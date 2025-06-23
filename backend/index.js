@@ -1,9 +1,11 @@
+
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import staffRoutes from './routes/Staff.route.js';
+import MemberRoute from './routes/member.route.js'
 
 dotenv.config({
     path : ".env"
@@ -23,7 +25,6 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/api/staff", staffRoutes); 
 
 mongoose.connect(process.env.MONGODB_CONN, { dbName: 'gym-website' })
   .then(() => console.log("Database connected"))
@@ -32,6 +33,10 @@ mongoose.connect(process.env.MONGODB_CONN, { dbName: 'gym-website' })
 app.listen(PORT, () => {
   console.log("Server running on port:", PORT);
 });
+
+app.use('/api/members', MemberRoute)
+app.use("/api/staff", staffRoutes); 
+    
 
 app.use((err, req, res, next) => { 
     console.error(err.stack);
