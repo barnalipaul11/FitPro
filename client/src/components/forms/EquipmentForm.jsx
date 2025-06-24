@@ -49,6 +49,7 @@ export function EquipmentForm({ open, onOpenChange }) {
     }
   })
 
+
   const onSubmit = async data => {
     console.log("Form data:", data)
     try {
