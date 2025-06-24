@@ -100,7 +100,7 @@ export function MemberManagement() {
       }
     }
     fetchMembers()
-   },[setMembers])
+   },[members])
   const filteredMembers = members.filter(
     member =>
       member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
