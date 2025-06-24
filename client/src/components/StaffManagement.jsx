@@ -10,6 +10,7 @@ import { StaffForm } from "@/components/forms/StaffForm"
 export function StaffManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingStaff, setEditingStaff] = useState(null);
   const [staff, setStaff] = useState([])
   //const { toast } = useToast()
 
@@ -26,19 +27,36 @@ export function StaffManagement() {
 
   const handleEdit = staffId => {
     console.log("Editing staff:", staffId)
+    const staffMember = staff.find(s => s._id === staffId);
+    setEditingStaff(staffMember);
+    setIsFormOpen(true);
     // toast({
     //   title: "Edit Staff",
     //   description: "Edit functionality will be implemented here"
     // })
   }
-
-  const handleDelete = (staffId, staffName) => {
-    console.log("Deleting staff:", staffId)
-    // toast({
-    //   title: "Delete Staff",
-    //   description: `${staffName} has been deleted successfully`,
-    //   variant: "destructive"
-    // })
+const handleDelete = async (staffId, staffName) => {
+    if (!window.confirm(`Are you sure you want to delete ${staffName}?`)) return;
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/staff/${staffId}`,
+        { method: "DELETE" }
+      );
+      if (!response.ok) throw new Error("Failed to delete member");
+      setStaff(prev => prev.filter(m => m._id !== staffId));
+      // toast({
+      //   title: "Delete Member",
+      //   description: `${staffName} has been deleted successfully`,
+      //   variant: "destructive"
+      // });
+    } catch (error) {
+      console.error("Error deleting member:", error);
+      // toast({
+      //   title: "Error",
+      //   description: "Failed to delete member",
+      //   variant: "destructive"
+      // });
+    }
   }
   useEffect(() => {
     const fetchStaff = async () => {
@@ -201,7 +219,15 @@ export function StaffManagement() {
         </CardContent>
       </Card>
 
-      <StaffForm open={isFormOpen} onOpenChange={setIsFormOpen} />
+      <StaffForm
+        key={editingStaff ? editingStaff._id : "new"}
+        open={isFormOpen}
+        onOpenChange={open => {
+          setIsFormOpen(open);
+          if (!open) setEditingStaff(null);
+        }}
+        initialValues={editingStaff}
+      />
     </div>
   )
 }

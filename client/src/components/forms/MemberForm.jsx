@@ -24,7 +24,8 @@ import {
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { createMember } from "@/api/memberApi"
+import { createMember, updateMember } from "@/api/memberApi"
+import { useEffect } from "react"
 
 const memberSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -35,23 +36,65 @@ const memberSchema = z.object({
   dueDate: z.string().min(1, "Start date is required")
 })
 
-export function MemberForm({ open, onOpenChange }) {
+export function MemberForm({ open, onOpenChange, initialValues }) {
+  const isEdit = !!initialValues
+
   const form = useForm({
     resolver: zodResolver(memberSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      subscription: "",
-      status: "",
-      dueDate: ""
-    }
+    defaultValues: isEdit
+      ? {
+          name: initialValues.name || "",
+          email: initialValues.email || "",
+          phone: initialValues.phone || "",
+          subscription: initialValues.membershipType || "",
+          status: initialValues.status || "",
+          dueDate: initialValues.membershipStartDate
+            ? initialValues.membershipStartDate.slice(0, 10)
+            : ""
+        }
+      : {
+          name: "",
+          email: "",
+          phone: "",
+          subscription: "",
+          status: "",
+          dueDate: ""
+        }
   })
+
+  useEffect(() => {
+    if (isEdit) {
+      form.reset({
+        name: initialValues.name || "",
+        email: initialValues.email || "",
+        phone: initialValues.phone || "",
+        subscription: initialValues.membershipType || "",
+        status: initialValues.status || "",
+        dueDate: initialValues.membershipStartDate
+          ? initialValues.membershipStartDate.slice(0, 10)
+          : ""
+      })
+    } else {
+      form.reset({
+        name: "",
+        email: "",
+        phone: "",
+        subscription: "",
+        status: "",
+        dueDate: ""
+      })
+    }
+  }, [initialValues, isEdit, form])
 
   const onSubmit = async data => {
     try {
-      await createMember(data)
-      // toast.success("Member added successfully!")
+      if (isEdit) {
+        await updateMember(initialValues._id, data)
+        // toast.success("Member updated successfully!")
+      } else {
+        await createMember(data)
+        // toast.success("Member added successfully!")
+      }
       form.reset()
       onOpenChange(false)
     } catch (error) {
@@ -64,7 +107,9 @@ export function MemberForm({ open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Member</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Edit Member" : "Add New Member"}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -195,7 +240,7 @@ export function MemberForm({ open, onOpenChange }) {
                 type="submit"
                 className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
               >
-                Add Member
+                {isEdit ? "Update Member" : "Add Member"}
               </Button>
             </div>
           </form>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Search,
   Filter,
@@ -9,13 +9,13 @@ import {
   MapPin,
   Calendar,
   Edit,
-  Trash2
-} from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { EquipmentForm } from "@/components/forms/EquipmentForm"
+  Trash2,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { EquipmentForm } from "@/components/forms/EquipmentForm";
 // import { useToast } from "@/hooks/use-toast"
 import {
   Pagination,
@@ -24,109 +24,129 @@ import {
   PaginationItem,
   PaginationLink,
   PaginationNext,
-  PaginationPrevious
-} from "@/components/ui/pagination"
-
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export function EquipmentTracking() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [equipment, setEquipment] = useState([]) 
-  const itemsPerPage = 8
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [equipment, setEquipment] = useState([]);
+  const [editingEquipment, setEditingEquipment] = useState(null);
+  const itemsPerPage = 8;
   //const { toast } = useToast()
 
-  const handleEdit = equipmentId => {
-    console.log("Editing equipment:", equipmentId)
+  const handleEdit = (equipmentId) => {
+    console.log("Editing equipment:", equipmentId);
+    const machine = equipment.find((eq) => eq._id == equipmentId);
+    setEditingEquipment(machine);
+    setIsFormOpen(true);
     // toast({
     //   title: "Edit Equipment",
     //   description: "Edit functionality will be implemented here"
     // })
-  }
+  };
 
-  const handleDelete = (equipmentId, equipmentName) => {
-    console.log("Deleting equipment:", equipmentId)
-    // toast({
-    //   title: "Delete Equipment",
-    //   description: `${equipmentName} has been deleted successfully`,
-    //   variant: "destructive"
-    // })
-  }
+  const handleDelete = async (equipmentId, equipmentName) => {
+    if (!window.confirm(`Are you sure you want to delete ${equipmentName}?`))
+      return;
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/equipment/${equipmentId}`,
+        { method: "DELETE" }
+      );
+      if (!response.ok) throw new Error("Failed to delete equipment");
+      setEquipment((prev) => prev.filter((eq) => eq._id !== equipmentId));
+      // toast({
+      //   title: "Delete Equipment",
+      //   description: `${equipmentName} has been deleted successfully`,
+      //   variant: "destructive"
+      // });
+    } catch (error) {
+      console.error("Error deleting equipment:", error);
+      // toast({
+      //   title: "Error",
+      //   description: "Failed to delete equipment",
+      //   variant: "destructive"
+      // });
+    }
+  };
 
-  const getStatusIcon = status => {
+  const getStatusIcon = (status) => {
     switch (status) {
       case "Good":
-        return <CheckCircle className="w-4 h-4 text-green-500" />
+        return <CheckCircle className="w-4 h-4 text-green-500" />;
       case "Needs Maintenance":
-        return <AlertTriangle className="w-4 h-4 text-yellow-500" />
+        return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
       case "Under Repair":
-        return <Settings className="w-4 h-4 text-red-500" />
+        return <Settings className="w-4 h-4 text-red-500" />;
       default:
-        return <Clock className="w-4 h-4 text-gray-500" />
+        return <Clock className="w-4 h-4 text-gray-500" />;
     }
-  }
+  };
 
-  const getStatusBadge = status => {
+  const getStatusBadge = (status) => {
     const variants = {
-      Good:
-        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-200",
+      Good: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-200",
       "Needs Maintenance":
         "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 border-yellow-200",
       "Under Repair":
-        "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border-red-200"
-    }
-    return variants[status] || "bg-gray-100 text-gray-800 border-gray-200"
-  }
+        "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border-red-200",
+    };
+    return variants[status] || "bg-gray-100 text-gray-800 border-gray-200";
+  };
 
   useEffect(() => {
-    const fetchEquipment = async () => {  
+    const fetchEquipment = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/equipment`)  
-        if (!response.ok) throw new Error("Failed to fetch equipment")
-        const data = await response.json()
-        setEquipment(data) // Set the fetched equipment data
-      } catch (error) { 
-        console.error("Error fetching equipment data:", error)
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/equipment`
+        );
+        if (!response.ok) throw new Error("Failed to fetch equipment");
+        const data = await response.json();
+        setEquipment(data); // Set the fetched equipment data
+      } catch (error) {
+        console.error("Error fetching equipment data:", error);
         // Optionally show a toast or notification here
       }
-    }
-    fetchEquipment()
-  })
+    };
+    fetchEquipment();
+  });
   const filteredEquipment = equipment.filter(
-    item =>
+    (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.category.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  );
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentEquipment = filteredEquipment.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(filteredEquipment.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentEquipment = filteredEquipment.slice(startIndex, endIndex);
 
-  const handlePageChange = page => {
-    setCurrentPage(page)
-  }
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const generatePageNumbers = () => {
-    const pages = []
-    const maxVisiblePages = 5
+    const pages = [];
+    const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
+        pages.push(i);
       }
     } else {
-      const start = Math.max(1, currentPage - 2)
-      const end = Math.min(totalPages, start + maxVisiblePages - 1)
+      const start = Math.max(1, currentPage - 2);
+      const end = Math.min(totalPages, start + maxVisiblePages - 1);
 
       for (let i = start; i <= end; i++) {
-        pages.push(i)
+        pages.push(i);
       }
     }
 
-    return pages
-  }
+    return pages;
+  };
 
   return (
     <div className="space-y-6">
@@ -154,9 +174,9 @@ export function EquipmentTracking() {
                 <Input
                   placeholder="Search equipment..."
                   value={searchTerm}
-                  onChange={e => {
-                    setSearchTerm(e.target.value)
-                    setCurrentPage(1)
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
                   }}
                   className="pl-10 w-64"
                 />
@@ -170,7 +190,7 @@ export function EquipmentTracking() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {currentEquipment.map(item => (
+            {currentEquipment.map((item) => (
               <Card
                 key={item._id} // <-- use _id here
                 className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-lg transition-shadow relative"
@@ -261,7 +281,7 @@ export function EquipmentTracking() {
                     />
                   </PaginationItem>
 
-                  {generatePageNumbers().map(page => (
+                  {generatePageNumbers().map((page) => (
                     <PaginationItem key={page}>
                       <PaginationLink
                         isActive={currentPage === page}
@@ -299,7 +319,15 @@ export function EquipmentTracking() {
         </CardContent>
       </Card>
 
-      <EquipmentForm open={isFormOpen} onOpenChange={setIsFormOpen} />
+      <EquipmentForm
+        key={editingEquipment ? editingEquipment._id : "new"}
+        open={isFormOpen}
+        onOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) setEditingEquipment(null);
+        }}
+        initialValues={editingEquipment}
+      />
     </div>
-  )
+  );
 }

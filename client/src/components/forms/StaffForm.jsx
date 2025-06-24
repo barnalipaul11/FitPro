@@ -24,7 +24,8 @@ import {
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { createStaff } from "@/api/staffApi"
+import { createStaff, updateStaff } from "@/api/staffApi"
+import { useEffect } from "react"
 
 const staffSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -36,29 +37,70 @@ const staffSchema = z.object({
   status: z.string().min(1, "Please select a status")
 })
 
-export function StaffForm({ open, onOpenChange }) {
+export function StaffForm({ open, onOpenChange, initialValues }) {
+  const isEdit = !!initialValues
+
   const form = useForm({
     resolver: zodResolver(staffSchema),
-    defaultValues: {
-      name: "",
-      role: "",
-      phone: "",
-      salary: "",
-      shiftStart: "",
-      shiftEnd: "",
-      status: ""
-    }
+    defaultValues: isEdit
+      ? {
+          name: initialValues.name || "",
+          role: initialValues.role || "",
+          phone: initialValues.phone || "",
+          salary: initialValues.salary || "",
+          shiftStart: initialValues.shift?.start || "",
+          shiftEnd: initialValues.shift?.end || "",
+          status: initialValues.status || ""
+        }
+      : {
+          name: "",
+          role: "",
+          phone: "",
+          salary: "",
+          shiftStart: "",
+          shiftEnd: "",
+          status: ""
+        }
   })
+
+  useEffect(() => {
+    if (isEdit) {
+      form.reset({
+        name: initialValues.name || "",
+        role: initialValues.role || "",
+        phone: initialValues.phone || "",
+        salary: initialValues.salary || "",
+        shiftStart: initialValues.shift?.start || "",
+        shiftEnd: initialValues.shift?.end || "",
+        status: initialValues.status || ""
+      })
+    } else {
+      form.reset({
+        name: "",
+        role: "",
+        phone: "",
+        salary: "",
+        shiftStart: "",
+        shiftEnd: "",
+        status: ""
+      })
+    }
+  }, [initialValues, isEdit, form])
 
   const onSubmit = async (data) => {
     try {
-      await createStaff(data) 
-
-      // toast.success("Staff member added successfully!");
+      if (isEdit) {
+        await updateStaff(initialValues._id, data)
+        // toast.success("Staff updated successfully!");
+      } else {
+        await createStaff(data)
+        // toast.success("Staff added successfully!");
+      }
       form.reset()
       onOpenChange(false)
     } catch (error) {
       // toast.error(`Error: ${error.message}`);
+      console.error(error)
     }
   }
 
@@ -66,7 +108,9 @@ export function StaffForm({ open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Staff Member</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Edit Staff Member" : "Add New Staff Member"}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -216,7 +260,7 @@ export function StaffForm({ open, onOpenChange }) {
                 type="submit"
                 className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
               >
-                Add Staff Member
+                {isEdit ? "Update Staff Member" : "Add Staff Member"}
               </Button>
             </div>
           </form>

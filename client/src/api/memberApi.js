@@ -26,3 +26,24 @@ export async function createMember(data) {
   }
   return response.json();
 }
+
+export async function updateMember(id, data) {
+  const payload = {
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+    membershipType: data.subscription,
+    membershipStartDate: data.dueDate,
+    status: data.status
+  };
+  const response = await fetch(`${API_BASE_URL}/members/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to update member");
+  }
+  return response.json();
+}

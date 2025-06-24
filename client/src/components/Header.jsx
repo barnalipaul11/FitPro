@@ -8,19 +8,16 @@ export function Header({ darkMode, toggleDarkMode }) {
     <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 p-4 sticky top-0 z-40">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200">
-            Gym Management Dashboard
-          </h1>
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="relative hidden md:block">
+          {/* <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
             <Input
               placeholder="Search members, staff..."
               className="pl-10 w-64 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
             />
-          </div>
+          </div> */}
 
           <Button
             variant="ghost"

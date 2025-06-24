@@ -25,7 +25,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { createEquipment } from "@/api/equipmentApi"
+import { createEquipment, updateEquipment } from "@/api/equipmentApi"
+import { useEffect } from "react"
 
 const equipmentSchema = z.object({
   name: z.string().min(2, "Equipment name must be at least 2 characters"),
@@ -36,28 +37,70 @@ const equipmentSchema = z.object({
   notes: z.string().optional()
 })
 
-export function EquipmentForm({ open, onOpenChange }) {
+export function EquipmentForm({ open, onOpenChange, initialValues }) {
+  const isEdit = !!initialValues
+
   const form = useForm({
     resolver: zodResolver(equipmentSchema),
-    defaultValues: {
-      name: "",
-      category: "",
-      location: "",
-      status: "",
-      lastMaintenance: "",
-      notes: ""
-    }
+    defaultValues: isEdit
+      ? {
+          name: initialValues.name || "",
+          category: initialValues.category || "",
+          location: initialValues.location || "",
+          status: initialValues.status || "",
+          lastMaintenance: initialValues.lastMaintenanceDate
+            ? initialValues.lastMaintenanceDate.slice(0, 10)
+            : "",
+          notes: initialValues.notes || ""
+        }
+      : {
+          name: "",
+          category: "",
+          location: "",
+          status: "",
+          lastMaintenance: "",
+          notes: ""
+        }
   })
 
+  useEffect(() => {
+    if (isEdit) {
+      form.reset({
+        name: initialValues.name || "",
+        category: initialValues.category || "",
+        location: initialValues.location || "",
+        status: initialValues.status || "",
+        lastMaintenance: initialValues.lastMaintenanceDate
+          ? initialValues.lastMaintenanceDate.slice(0, 10)
+          : "",
+        notes: initialValues.notes || ""
+      })
+    } else {
+      form.reset({
+        name: "",
+        category: "",
+        location: "",
+        status: "",
+        lastMaintenance: "",
+        notes: ""
+      })
+    }
+  }, [initialValues, isEdit, form])
 
   const onSubmit = async data => {
-    console.log("Form data:", data)
     try {
-      await createEquipment(data)
+      if (isEdit) {
+        await updateEquipment(initialValues._id, data)
+        // Optionally show a toast: "Equipment updated successfully!"
+      } else {
+        await createEquipment(data)
+        // Optionally show a toast: "Equipment added successfully!"
+      }
       form.reset()
       onOpenChange(false)
     } catch (error) {
       // toast.error(`Error: ${error.message}`)
+      console.error(error)
     }
   }
 
@@ -65,7 +108,7 @@ export function EquipmentForm({ open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add New Equipment</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit Equipment" : "Add New Equipment"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -214,7 +257,7 @@ export function EquipmentForm({ open, onOpenChange }) {
                 type="submit"
                 className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
               >
-                Add Equipment
+                {isEdit ? "Update Equipment" : "Add Equipment"}
               </Button>
             </div>
           </form>
