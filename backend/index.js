@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import staffRoutes from './routes/Staff.route.js';
 import MemberRoute from './routes/member.route.js'
+import EquipmentRoute from './routes/Equipment.route.js';
 
 dotenv.config({
     path : ".env"
@@ -36,7 +37,7 @@ app.listen(PORT, () => {
 
 app.use('/api/members', MemberRoute)
 app.use("/api/staff", staffRoutes); 
-    
+app.use('/api/equipment', EquipmentRoute); 
 
 app.use((err, req, res, next) => { 
     console.error(err.stack);

@@ -1,5 +1,5 @@
-import Equipment from "../models/Equipment.model";
-import { handleError } from "../helpers/handleError";
+import Equipment from "../models/Equipment.model.js";
+import { handleError } from "../helpers/handleError.js";
 import { validationResult, body, param } from "express-validator";  
 import mongoose from "mongoose";
 
@@ -26,7 +26,7 @@ export const validateEquipmentBody = [
         .trim()
         .notEmpty()
         .withMessage("Status is required")
-        .isIn(["Good", "Need Maintenance", "Under Repair", "Out of Order"])
+        .isIn(["Good", "Needs Maintenance", "Under Repair", "Out of Order"])
         .withMessage("Invalid status"),
     body("notes")
         .optional()
@@ -46,6 +46,7 @@ export const getEquipment = async (req, res) => {
 };
 
 export const createEquipment = async (req, res) => {
+    console.log("Creating equipment with data:", req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const err = handleError(400, "Validation error");

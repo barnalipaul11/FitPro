@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-//import { toast } from "@/components/ui/sonner"
+import { createEquipment } from "@/api/equipmentApi"
 
 const equipmentSchema = z.object({
   name: z.string().min(2, "Equipment name must be at least 2 characters"),
@@ -49,11 +49,15 @@ export function EquipmentForm({ open, onOpenChange }) {
     }
   })
 
-  const onSubmit = data => {
-    console.log("New equipment data:", data)
-    toast.success("Equipment added successfully!")
-    form.reset()
-    onOpenChange(false)
+  const onSubmit = async data => {
+    console.log("Form data:", data)
+    try {
+      await createEquipment(data)
+      form.reset()
+      onOpenChange(false)
+    } catch (error) {
+      // toast.error(`Error: ${error.message}`)
+    }
   }
 
   return (
