@@ -13,4 +13,5 @@ EquipmentRoute.get('/', getEquipment);
 EquipmentRoute.post('/', validateEquipmentBody, createEquipment);   
 EquipmentRoute.put('/:id', validateEquipmentId, validateEquipmentBody, updateEquipment);
 EquipmentRoute.delete('/:id', validateEquipmentId, deleteEquipment);
+
 export default EquipmentRoute;
