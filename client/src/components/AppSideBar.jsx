@@ -1,11 +1,13 @@
+import React, { useState } from "react";
 import {
   Users,
   UserCheck,
   Dumbbell,
   BarChart3,
   LayoutDashboard,
-  Bell
-} from "lucide-react"
+  Bell,
+  Menu
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,8 +19,9 @@ import {
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter
-} from "@/components/ui/sidebar"
-import { useNavigate } from "react-router-dom"; // Adjust import path as necessary
+} from "@/components/ui/sidebar";
+import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, key: "/" },
@@ -27,12 +30,16 @@ const menuItems = [
   { title: "Equipment", icon: Dumbbell, key: "/equipment" },
   { title: "Analytics", icon: BarChart3, key: "/info" },
   { title: "Notification", icon: Bell, key: "/notifications" },
-]
+];
 
 export function AppSidebar({ activeTab, setActiveTab }) {
-   const navigate = useNavigate();
-  return (
-    <Sidebar className="border-r border-slate-200 dark:border-slate-700">
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
+
+  // Sidebar content for desktop
+  const sidebarContent = (
+    <>
       <SidebarHeader className="p-6">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
@@ -59,7 +66,10 @@ export function AppSidebar({ activeTab, setActiveTab }) {
               {menuItems.map(item => (
                 <SidebarMenuItem key={item.key}>
                   <SidebarMenuButton
-                    onClick={() => navigate(item.key)}
+                    onClick={() => {
+                      navigate(item.key);
+                      if (isMobile) setOpen(false);
+                    }}
                     className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
                     <item.icon className="w-5 h-5" />
@@ -87,6 +97,31 @@ export function AppSidebar({ activeTab, setActiveTab }) {
           </div>
         </div>
       </SidebarFooter>
+    </>
+  );
+
+  // Mobile: show vertical sidebar at left with only icons
+  if (isMobile) {
+    return (
+      <aside className="fixed top-0 left-0 h-full w-16 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col items-center py-4 z-50">
+        {menuItems.map(item => (
+          <button
+            key={item.key}
+            onClick={() => navigate(item.key)}
+            className="mb-6 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full flex items-center justify-center"
+            aria-label={item.title}
+          >
+            <item.icon className="w-6 h-6 text-slate-700 dark:text-slate-200" />
+          </button>
+        ))}
+      </aside>
+    );
+  }
+
+  // Desktop: show sidebar always
+  return (
+    <Sidebar className="border-r border-slate-200 dark:border-slate-700 h-full">
+      {sidebarContent}
     </Sidebar>
-  )
+  );
 }
