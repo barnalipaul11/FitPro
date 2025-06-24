@@ -51,7 +51,7 @@ export function EquipmentForm({ open, onOpenChange }) {
 
   const onSubmit = data => {
     console.log("New equipment data:", data)
-    toast.success("Equipment added successfully!")
+    //toast.success("Equipment added successfully!")
     form.reset()
     onOpenChange(false)
   }

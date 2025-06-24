@@ -10,7 +10,7 @@ import { StaffForm } from "@/components/forms/StaffForm"
 export function StaffManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [staff, setStaff] = useState([]) // <-- move staff to state
+  const [staff, setStaff] = useState([])
   //const { toast } = useToast()
 
   const getStatusBadge = status => {
@@ -43,10 +43,10 @@ export function StaffManagement() {
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const response = await fetch("http://localhost:4000/api/staff") // Adjust URL if needed
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/staff`) 
         if (!response.ok) throw new Error("Failed to fetch staff")
         const data = await response.json()
-        setStaff(data) // set state with fetched staff
+        setStaff(data) 
       } catch (error) {
         console.error("Error fetching staff data:", error)
         // Optionally show a toast or notification here

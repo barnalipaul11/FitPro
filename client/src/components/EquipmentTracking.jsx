@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { use, useEffect, useState } from "react"
 import {
   Search,
   Filter,
@@ -27,103 +27,12 @@ import {
   PaginationPrevious
 } from "@/components/ui/pagination"
 
-const equipment = [
-  {
-    id: 1,
-    name: "Treadmill Pro X1",
-    category: "Cardio",
-    status: "Good",
-    lastMaintenance: "2024-05-15",
-    nextMaintenance: "2024-07-15",
-    location: "Floor 1 - Zone A"
-  },
-  {
-    id: 2,
-    name: "Bench Press Station",
-    category: "Strength",
-    status: "Needs Maintenance",
-    lastMaintenance: "2024-04-10",
-    nextMaintenance: "2024-06-20",
-    location: "Floor 1 - Zone B"
-  },
-  {
-    id: 3,
-    name: "Rowing Machine Elite",
-    category: "Cardio",
-    status: "Good",
-    lastMaintenance: "2024-06-01",
-    nextMaintenance: "2024-08-01",
-    location: "Floor 2 - Zone A"
-  },
-  {
-    id: 4,
-    name: "Cable Cross Machine",
-    category: "Strength",
-    status: "Under Repair",
-    lastMaintenance: "2024-03-20",
-    nextMaintenance: "2024-06-25",
-    location: "Floor 1 - Zone C"
-  },
-  {
-    id: 5,
-    name: "Elliptical Trainer",
-    category: "Cardio",
-    status: "Good",
-    lastMaintenance: "2024-05-28",
-    nextMaintenance: "2024-07-28",
-    location: "Floor 2 - Zone B"
-  },
-  {
-    id: 6,
-    name: "Leg Press Machine",
-    category: "Strength",
-    status: "Good",
-    lastMaintenance: "2024-06-10",
-    nextMaintenance: "2024-08-10",
-    location: "Floor 1 - Zone A"
-  },
-  {
-    id: 7,
-    name: "Stationary Bike",
-    category: "Cardio",
-    status: "Needs Maintenance",
-    lastMaintenance: "2024-04-25",
-    nextMaintenance: "2024-06-25",
-    location: "Floor 2 - Zone C"
-  },
-  {
-    id: 8,
-    name: "Dumbbells Set",
-    category: "Strength",
-    status: "Good",
-    lastMaintenance: "2024-05-20",
-    nextMaintenance: "2024-07-20",
-    location: "Floor 1 - Zone B"
-  },
-  {
-    id: 9,
-    name: "Pull-up Bar",
-    category: "Strength",
-    status: "Under Repair",
-    lastMaintenance: "2024-03-15",
-    nextMaintenance: "2024-06-15",
-    location: "Floor 2 - Zone A"
-  },
-  {
-    id: 10,
-    name: "Spin Bike",
-    category: "Cardio",
-    status: "Good",
-    lastMaintenance: "2024-06-05",
-    nextMaintenance: "2024-08-05",
-    location: "Floor 1 - Zone C"
-  }
-]
 
 export function EquipmentTracking() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [equipment, setEquipment] = useState([]) // Initial equipment data
   const itemsPerPage = 8
   //const { toast } = useToast()
 
@@ -169,6 +78,20 @@ export function EquipmentTracking() {
     return variants[status] || "bg-gray-100 text-gray-800 border-gray-200"
   }
 
+  useEffect(() => {
+    const fetchEquipment = async () => {  
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/equipment`)  
+        if (!response.ok) throw new Error("Failed to fetch equipment")
+        const data = await response.json()
+        setEquipment(data) // Set the fetched equipment data
+      } catch (error) { 
+        console.error("Error fetching equipment data:", error)
+        // Optionally show a toast or notification here
+      }
+    }
+    fetchEquipment()
+  }, [])
   const filteredEquipment = equipment.filter(
     item =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
