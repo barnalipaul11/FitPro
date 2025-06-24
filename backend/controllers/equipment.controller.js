@@ -46,7 +46,7 @@ export const getEquipment = async (req, res) => {
 };
 
 export const createEquipment = async (req, res) => {
-    console.log("Creating equipment with data:", req.body);
+   
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const err = handleError(400, "Validation error");

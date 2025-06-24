@@ -24,7 +24,7 @@ import {
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-//import { toast } from "@/components/ui/sonner"
+import { createMember } from "@/api/memberApi"
 
 const memberSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -48,11 +48,16 @@ export function MemberForm({ open, onOpenChange }) {
     }
   })
 
-  const onSubmit = data => {
-    console.log("New member data:", data)
-    toast.success("Member added successfully!")
-    form.reset()
-    onOpenChange(false)
+  const onSubmit = async data => {
+    try {
+      await createMember(data)
+      // toast.success("Member added successfully!")
+      form.reset()
+      onOpenChange(false)
+    } catch (error) {
+      // toast.error(`Error: ${error.message}`)
+      console.error(error)
+    }
   }
 
   return (
@@ -136,7 +141,7 @@ export function MemberForm({ open, onOpenChange }) {
               )}
             />
 
-            {/* <FormField
+            <FormField
               control={form.control}
               name="status"
               render={({ field }) => (
@@ -162,7 +167,7 @@ export function MemberForm({ open, onOpenChange }) {
                   <FormMessage />
                 </FormItem>
               )}
-            /> */}
+            />
 
             <FormField
               control={form.control}
