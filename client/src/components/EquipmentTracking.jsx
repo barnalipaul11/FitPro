@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Search,
   Filter,
@@ -32,7 +32,7 @@ export function EquipmentTracking() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
-  const [equipment, setEquipment] = useState([]) // Initial equipment data
+  const [equipment, setEquipment] = useState([]) 
   const itemsPerPage = 8
   //const { toast } = useToast()
 
@@ -91,7 +91,7 @@ export function EquipmentTracking() {
       }
     }
     fetchEquipment()
-  }, [])
+  })
   const filteredEquipment = equipment.filter(
     item =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -172,7 +172,7 @@ export function EquipmentTracking() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {currentEquipment.map(item => (
               <Card
-                key={item.id}
+                key={item._id} // <-- use _id here
                 className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-lg transition-shadow relative"
               >
                 <CardHeader className="pb-3">
@@ -219,7 +219,7 @@ export function EquipmentTracking() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleEdit(item.id)}
+                      onClick={() => handleEdit(item._id)} // <-- use _id here
                       className="h-8 w-8 p-0"
                     >
                       <Edit className="h-4 w-4" />
@@ -227,7 +227,7 @@ export function EquipmentTracking() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDelete(item.id, item.name)}
+                      onClick={() => handleDelete(item._id, item.name)} // <-- use _id here
                       className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />

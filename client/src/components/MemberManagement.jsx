@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useFetch, useEffect } from "react"
 import {
   Search,
   Filter,
@@ -13,59 +13,15 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MemberForm } from "@/components/forms/MemberForm"
+
 //import { useToast } from "@/hooks/use-toast"
 
-const members = [
-  {
-    id: 1,
-    name: "John Smith",
-    email: "john@example.com",
-    subscription: "Premium",
-    status: "Active",
-    dueDate: "2024-07-15",
-    phone: "+1234567890"
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    email: "sarah@example.com",
-    subscription: "Basic",
-    status: "Expiring Soon",
-    dueDate: "2024-06-25",
-    phone: "+1234567891"
-  },
-  {
-    id: 3,
-    name: "Mike Wilson",
-    email: "mike@example.com",
-    subscription: "Premium",
-    status: "Active",
-    dueDate: "2024-08-10",
-    phone: "+1234567892"
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    email: "emily@example.com",
-    subscription: "Basic",
-    status: "Expired",
-    dueDate: "2024-06-10",
-    phone: "+1234567893"
-  },
-  {
-    id: 5,
-    name: "David Brown",
-    email: "david@example.com",
-    subscription: "Premium",
-    status: "Active",
-    dueDate: "2024-07-20",
-    phone: "+1234567894"
-  }
-]
+
 
 export function MemberManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [members, setMembers] = useState([])
   //const { toast } = useToast()
 
   const handleEdit = memberId => {
@@ -84,7 +40,27 @@ export function MemberManagement() {
     //   variant: "destructive"
     // })
   }
-
+  function getDueDate(startDate, type) {
+    if (!startDate) return "";
+    const date = new Date(startDate);
+    switch (type?.toLowerCase()) {
+      case "basic":
+        date.setMonth(date.getMonth() + 1);
+        break;
+      case "silver":
+        date.setMonth(date.getMonth() + 3);
+        break;
+      case "gold":
+        date.setMonth(date.getMonth() + 6);
+        break;
+      case "platinum":
+        date.setFullYear(date.getFullYear() + 1);
+        break;
+      default:
+        return "";
+    }
+    return date.toLocaleDateString();
+  }
   const getStatusIcon = status => {
     switch (status) {
       case "Active":
@@ -109,6 +85,22 @@ export function MemberManagement() {
     return variants[status] || ""
   }
 
+   useEffect(()=>{
+    const fetchMembers = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/members`)
+        if (!response.ok) throw new Error("Failed to fetch members")
+        const data = await response.json()
+        setMembers(data)
+        console.log("Fetched members:", data);
+        
+      } catch (error) {
+        console.error("Error fetching member data:", error)
+        // Optionally show a toast or notification here
+      }
+    }
+    fetchMembers()
+   },[setMembers])
   const filteredMembers = members.filter(
     member =>
       member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -180,7 +172,7 @@ export function MemberManagement() {
               <tbody>
                 {filteredMembers.map(member => (
                   <tr
-                    key={member.id}
+                    key={member._id} // <-- use _id here
                     className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                   >
                     <td className="py-4 px-4">
@@ -205,7 +197,7 @@ export function MemberManagement() {
                     </td>
                     <td className="py-4 px-4">
                       <Badge variant="outline" className="font-medium">
-                        {member.subscription}
+                        {member.membershipType}
                       </Badge>
                     </td>
                     <td className="py-4 px-4">
@@ -217,7 +209,7 @@ export function MemberManagement() {
                       </div>
                     </td>
                     <td className="py-4 px-4 text-slate-600 dark:text-slate-400">
-                      {member.dueDate}
+                      {getDueDate(member.membershipStartDate, member.membershipType)}
                     </td>
                     <td className="py-4 px-4 text-slate-600 dark:text-slate-400">
                       {member.phone}
@@ -227,7 +219,7 @@ export function MemberManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleEdit(member.id)}
+                          onClick={() => handleEdit(member._id)} // <-- use _id here
                           className="h-8 w-8 p-0"
                         >
                           <Edit className="h-4 w-4" />
@@ -235,7 +227,7 @@ export function MemberManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(member.id, member.name)}
+                          onClick={() => handleDelete(member._id, member.name)} // <-- use _id here
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
                           <Trash2 className="h-4 w-4" />
