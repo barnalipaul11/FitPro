@@ -5,7 +5,7 @@ const staffSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   role: {
     type: String,
-    enum: ["Personal Trainer", "Yoga Trainer","Nutritionist","Maintenance", "Gym Manager", "Receptionist"],
+    enum: ["Personal Trainer", "Yoga Instructor","Nutritionist","Maintenance", "Gym Manager", "Receptionist"],
     required: true,
   },
   shift: {
