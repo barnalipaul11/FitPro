@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Search, Filter, Clock, DollarSign, Edit, Trash2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -7,57 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { StaffForm } from "@/components/forms/StaffForm"
 //import { useToast } from "@/hooks/use-toast"
 
-const staff = [
-  {
-    id: 1,
-    name: "Alex Thompson",
-    role: "Personal Trainer",
-    shift: "6:00 AM - 2:00 PM",
-    salary: "$4,500",
-    status: "Active",
-    phone: "+1234567890"
-  },
-  {
-    id: 2,
-    name: "Maria Garcia",
-    role: "Yoga Instructor",
-    shift: "10:00 AM - 6:00 PM",
-    salary: "$3,200",
-    status: "Active",
-    phone: "+1234567891"
-  },
-  {
-    id: 3,
-    name: "James Wilson",
-    role: "Gym Manager",
-    shift: "8:00 AM - 5:00 PM",
-    salary: "$5,800",
-    status: "Active",
-    phone: "+1234567892"
-  },
-  {
-    id: 4,
-    name: "Lisa Chen",
-    role: "Nutritionist",
-    shift: "12:00 PM - 8:00 PM",
-    salary: "$4,000",
-    status: "On Leave",
-    phone: "+1234567893"
-  },
-  {
-    id: 5,
-    name: "Robert Johnson",
-    role: "Maintenance",
-    shift: "7:00 AM - 3:00 PM",
-    salary: "$2,800",
-    status: "Active",
-    phone: "+1234567894"
-  }
-]
-
 export function StaffManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFormOpen, setIsFormOpen] = useState(false)
+  const [staff, setStaff] = useState([]) // <-- move staff to state
   //const { toast } = useToast()
 
   const getStatusBadge = status => {
@@ -87,6 +40,20 @@ export function StaffManagement() {
     //   variant: "destructive"
     // })
   }
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/staff") // Adjust URL if needed
+        if (!response.ok) throw new Error("Failed to fetch staff")
+        const data = await response.json()
+        setStaff(data) // set state with fetched staff
+      } catch (error) {
+        console.error("Error fetching staff data:", error)
+        // Optionally show a toast or notification here
+      }
+    }
+    fetchStaff()
+  }, [])
 
   const filteredStaff = staff.filter(
     member =>
@@ -159,7 +126,7 @@ export function StaffManagement() {
               <tbody>
                 {filteredStaff.map(member => (
                   <tr
-                    key={member.id}
+                    key={member._id} // <-- use _id here
                     className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                   >
                     <td className="py-4 px-4">
@@ -190,7 +157,9 @@ export function StaffManagement() {
                     <td className="py-4 px-4">
                       <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
                         <Clock className="w-4 h-4" />
-                        <span>{member.shift}</span>
+                        <span>
+                          {member.shift?.start} - {member.shift?.end}
+                        </span>
                       </div>
                     </td>
                     <td className="py-4 px-4">
@@ -209,7 +178,7 @@ export function StaffManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleEdit(member.id)}
+                          onClick={() => handleEdit(member._id)} // <-- use _id here
                           className="h-8 w-8 p-0"
                         >
                           <Edit className="h-4 w-4" />
@@ -217,7 +186,7 @@ export function StaffManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(member.id, member.name)}
+                          onClick={() => handleDelete(member._id, member.name)} // <-- use _id here
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
                           <Trash2 className="h-4 w-4" />
