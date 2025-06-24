@@ -5,10 +5,6 @@ const equipmentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    type: {
-        type: String,
-        required: true,
-    },
     location: {
         type: String,
         required: true, 
@@ -20,7 +16,7 @@ const equipmentSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["Good", "Need Maintenance", "Under Repair", "Out of Order"],
+        enum: ["Good", "Needs Maintenance", "Under Repair", "Out of Order"],
         default: "Good",
     },
     lastMaintenanceDate: {
