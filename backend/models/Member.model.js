@@ -12,7 +12,6 @@ const memberSchema = new mongoose.Schema({
     email:{
         type: String,
         required: true,
-        unique: true,
     },
     membershipType: {
         type: String,

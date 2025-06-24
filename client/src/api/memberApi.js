@@ -1,6 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export async function createMember(data) {
+  console.log("Creating member with data:", data);
   const payload = {
     name: data.name,
     email: data.email,
@@ -9,6 +10,7 @@ export async function createMember(data) {
     membershipStartDate: data.dueDate, // match backend field
     status: data.status
   };
+  console.log("Payload for member creation:", payload);
 
   const response = await fetch(`${API_BASE_URL}/members`, {
     method: "POST",
