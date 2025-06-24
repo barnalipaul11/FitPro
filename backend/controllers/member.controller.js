@@ -24,6 +24,7 @@ export const getMembers = async (req, res) => {
 };
 
 export const createMember = async (req, res) => {
+  
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const err = handleError(400, 'Validation error');
