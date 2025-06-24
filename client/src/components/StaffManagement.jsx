@@ -53,7 +53,7 @@ export function StaffManagement() {
       }
     }
     fetchStaff()
-  }, [])
+  })
 
   const filteredStaff = staff.filter(
     member =>
