@@ -22,23 +22,42 @@ export function MemberManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [members, setMembers] = useState([])
+  const [editingMember, setEditingMember] = useState(null);
   //const { toast } = useToast()
 
   const handleEdit = memberId => {
     console.log("Editing member:", memberId)
+    const member = members.find(m => m._id === memberId);
+    setEditingMember(member);
+    setIsFormOpen(true);
     // toast({
     //   title: "Edit Member",
     //   description: "Edit functionality will be implemented here"
     // })
   }
 
-  const handleDelete = (memberId, memberName) => {
-    console.log("Deleting member:", memberId)
-    // toast({
-    //   title: "Delete Member",
-    //   description: `${memberName} has been deleted successfully`,
-    //   variant: "destructive"
-    // })
+  const handleDelete = async (memberId, memberName) => {
+    if (!window.confirm(`Are you sure you want to delete ${memberName}?`)) return;
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/members/${memberId}`,
+        { method: "DELETE" }
+      );
+      if (!response.ok) throw new Error("Failed to delete member");
+      setMembers(prev => prev.filter(m => m._id !== memberId));
+      // toast({
+      //   title: "Delete Member",
+      //   description: `${memberName} has been deleted successfully`,
+      //   variant: "destructive"
+      // });
+    } catch (error) {
+      console.error("Error deleting member:", error);
+      // toast({
+      //   title: "Error",
+      //   description: "Failed to delete member",
+      //   variant: "destructive"
+      // });
+    }
   }
   function getDueDate(startDate, type) {
     if (!startDate) return "";
@@ -242,7 +261,15 @@ export function MemberManagement() {
         </CardContent>
       </Card>
 
-      <MemberForm open={isFormOpen} onOpenChange={setIsFormOpen} />
+      <MemberForm
+        key={editingMember ? editingMember._id : "new"}
+        open={isFormOpen}
+        onOpenChange={open => {
+          setIsFormOpen(open);
+          if (!open) setEditingMember(null);
+        }}
+        initialValues={editingMember}
+      />
     </div>
   )
 }
