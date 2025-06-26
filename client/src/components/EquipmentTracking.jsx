@@ -26,6 +26,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { DeletePopup } from "@/utils/deletepopup"
 
 export function EquipmentTracking() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +35,7 @@ export function EquipmentTracking() {
   const [equipment, setEquipment] = useState([]);
   const [editingEquipment, setEditingEquipment] = useState(null);
   const itemsPerPage = 8;
+  const [deletePopup, setDeletePopup] = useState({ open: false, equipmentId: null, equipmentName: "" })
   //const { toast } = useToast()
 
   const handleEdit = (equipmentId) => {
@@ -47,28 +49,35 @@ export function EquipmentTracking() {
     // })
   };
 
-  const handleDelete = async (equipmentId, equipmentName) => {
-    if (!window.confirm(`Are you sure you want to delete ${equipmentName}?`))
-      return;
+  const handleDelete = (equipmentId, equipmentName) => {
+    console.log("Deleting equipment:", equipmentId);  
+    setDeletePopup({ open: true, equipmentId, equipmentName });
+    // toast({})
+    }
+  const confirmDelete = async () => {
+    const { equipmentId, equipmentName } = deletePopup;
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/equipment/${equipmentId}`,
-        { method: "DELETE" }
+        {
+          method: "DELETE",
+        }
       );
       if (!response.ok) throw new Error("Failed to delete equipment");
-      setEquipment((prev) => prev.filter((eq) => eq._id !== equipmentId));
+      setEquipment(equipment.filter((eq) => eq._id !== equipmentId));
       // toast({
-      //   title: "Delete Equipment",
-      //   description: `${equipmentName} has been deleted successfully`,
-      //   variant: "destructive"
-      // });
+      //   title: "Success",
+      //   description: `${equipmentName} has been deleted successfully`
+      // })
     } catch (error) {
       console.error("Error deleting equipment:", error);
       // toast({
       //   title: "Error",
-      //   description: "Failed to delete equipment",
-      //   variant: "destructive"
-      // });
+      //   description: "Failed to delete equipment"
+      // })
+    }
+    finally {
+      setDeletePopup({ open: false, equipmentId: null, equipmentName: "" });
     }
   };
 
@@ -327,6 +336,13 @@ export function EquipmentTracking() {
           if (!open) setEditingEquipment(null);
         }}
         initialValues={editingEquipment}
+      />
+      <DeletePopup
+        open={deletePopup.open}
+        title="Delete Equipment"
+        message={`Are you sure you want to delete ${deletePopup.equipmentName}?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletePopup({ open: false, equipmentId: null, equipmentName: "" })}
       />
     </div>
   );

@@ -3,9 +3,12 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/AppSidebar"
 import { Header } from "@/components/Header"
 import { Analytics } from "@/components/Analytics"
+import { MemberManagement } from "@/components/MemberManagement"
+import { EnrollmentForm } from "@/components/forms/EnrollmentForm"
 const Info = () => {
 
     const [darkMode, setDarkMode] = useState(false)
+    const [enrollmentOpen, setEnrollmentOpen] = useState(false);
 
     const toggleDarkMode = () => {
         setDarkMode(!darkMode)
@@ -23,8 +26,9 @@ const Info = () => {
                             toggleDarkMode={toggleDarkMode}
                         />
                         <div className="p-6">
-                            <Analytics />
-                        </div>
+                            <Analytics onOpenEnrollment={() => setEnrollmentOpen(true)} />
+                            <EnrollmentForm open={enrollmentOpen} onOpenChange={setEnrollmentOpen} />
+                        </div>  
                     </main>
                 </div>
             </SidebarProvider>
