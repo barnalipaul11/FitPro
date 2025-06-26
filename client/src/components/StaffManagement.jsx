@@ -5,73 +5,62 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { StaffForm } from "@/components/forms/StaffForm"
-//import { useToast } from "@/hooks/use-toast"
+import { DeletePopup } from "@/utils/deletepopup"
 
 export function StaffManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editingStaff, setEditingStaff] = useState(null);
+  const [editingStaff, setEditingStaff] = useState(null)
   const [staff, setStaff] = useState([])
-  //const { toast } = useToast()
+  const [deletePopup, setDeletePopup] = useState({ open: false, staffId: null, staffName: "" })
 
   const getStatusBadge = status => {
     const variants = {
-      Active:
-        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-      "On Leave":
-        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      Active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      "On Leave": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
       Inactive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
     }
     return variants[status] || ""
   }
 
   const handleEdit = staffId => {
-    console.log("Editing staff:", staffId)
-    const staffMember = staff.find(s => s._id === staffId);
-    setEditingStaff(staffMember);
-    setIsFormOpen(true);
-    // toast({
-    //   title: "Edit Staff",
-    //   description: "Edit functionality will be implemented here"
-    // })
+    const staffMember = staff.find(s => s._id === staffId)
+    setEditingStaff(staffMember)
+    setIsFormOpen(true)
   }
-const handleDelete = async (staffId, staffName) => {
-    if (!window.confirm(`Are you sure you want to delete ${staffName}?`)) return;
+
+  const handleDelete = (staffId, staffName) => {
+    setDeletePopup({ open: true, staffId, staffName })
+  }
+
+  const confirmDelete = async () => {
+    const { staffId } = deletePopup
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/staff/${staffId}`,
-        { method: "DELETE" }
-      );
-      if (!response.ok) throw new Error("Failed to delete member");
-      setStaff(prev => prev.filter(m => m._id !== staffId));
-      // toast({
-      //   title: "Delete Member",
-      //   description: `${staffName} has been deleted successfully`,
-      //   variant: "destructive"
-      // });
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/staff/${staffId}`, {
+        method: "DELETE"
+      })
+      if (!response.ok) throw new Error("Failed to delete staff member")
+      setStaff(staff.filter(staff => staff._id !== staffId))
     } catch (error) {
-      console.error("Error deleting member:", error);
-      // toast({
-      //   title: "Error",
-      //   description: "Failed to delete member",
-      //   variant: "destructive"
-      // });
+      console.error("Error deleting staff member:", error)
+    } finally {
+      setDeletePopup({ open: false, staffId: null, staffName: "" })
     }
   }
+
   useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/staff`) 
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/staff`)
         if (!response.ok) throw new Error("Failed to fetch staff")
         const data = await response.json()
-        setStaff(data) 
+        setStaff(data)
       } catch (error) {
         console.error("Error fetching staff data:", error)
-        // Optionally show a toast or notification here
       }
     }
     fetchStaff()
-  })
+  }, []) // <-- Only run on mount
 
   const filteredStaff = staff.filter(
     member =>
@@ -144,7 +133,7 @@ const handleDelete = async (staffId, staffName) => {
               <tbody>
                 {filteredStaff.map(member => (
                   <tr
-                    key={member._id} // <-- use _id here
+                    key={member._id}
                     className="border-b border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
                   >
                     <td className="py-4 px-4">
@@ -196,7 +185,7 @@ const handleDelete = async (staffId, staffName) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleEdit(member._id)} // <-- use _id here
+                          onClick={() => handleEdit(member._id)}
                           className="h-8 w-8 p-0"
                         >
                           <Edit className="h-4 w-4" />
@@ -204,7 +193,7 @@ const handleDelete = async (staffId, staffName) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(member._id, member.name)} // <-- use _id here
+                          onClick={() => handleDelete(member._id, member.name)}
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -223,10 +212,18 @@ const handleDelete = async (staffId, staffName) => {
         key={editingStaff ? editingStaff._id : "new"}
         open={isFormOpen}
         onOpenChange={open => {
-          setIsFormOpen(open);
-          if (!open) setEditingStaff(null);
+          setIsFormOpen(open)
+          if (!open) setEditingStaff(null)
         }}
         initialValues={editingStaff}
+      />
+
+      <DeletePopup
+        open={deletePopup.open}
+        title="Delete Staff"
+        message={`Are you sure you want to delete ${deletePopup.staffName}?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletePopup({ open: false, staffId: null, staffName: "" })}
       />
     </div>
   )

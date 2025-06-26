@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { MemberForm } from "@/components/forms/MemberForm"
+import { DeletePopup } from "@/utils/deletepopup";
 
 //import { useToast } from "@/hooks/use-toast"
 
@@ -23,6 +24,7 @@ export function MemberManagement() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [members, setMembers] = useState([])
   const [editingMember, setEditingMember] = useState(null);
+  const [deletePopup, setDeletePopup] = useState({ open: false, memberId: null, memberName: "" });
   //const { toast } = useToast()
 
   const handleEdit = memberId => {
@@ -36,8 +38,12 @@ export function MemberManagement() {
     // })
   }
 
-  const handleDelete = async (memberId, memberName) => {
-    if (!window.confirm(`Are you sure you want to delete ${memberName}?`)) return;
+  const handleDelete = (memberId, memberName) => {
+    setDeletePopup({ open: true, memberId, memberName });
+  };
+
+  const confirmDelete = async () => {
+    const { memberId, memberName } = deletePopup;
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/members/${memberId}`,
@@ -45,20 +51,15 @@ export function MemberManagement() {
       );
       if (!response.ok) throw new Error("Failed to delete member");
       setMembers(prev => prev.filter(m => m._id !== memberId));
-      // toast({
-      //   title: "Delete Member",
-      //   description: `${memberName} has been deleted successfully`,
-      //   variant: "destructive"
-      // });
+      // Optionally show toast here
     } catch (error) {
       console.error("Error deleting member:", error);
-      // toast({
-      //   title: "Error",
-      //   description: "Failed to delete member",
-      //   variant: "destructive"
-      // });
+      // Optionally show toast here
+    } finally {
+      setDeletePopup({ open: false, memberId: null, memberName: "" });
     }
-  }
+  };
+
   function getDueDate(startDate, type) {
     if (!startDate) return "";
     const date = new Date(startDate);
@@ -118,8 +119,7 @@ export function MemberManagement() {
         // Optionally show a toast or notification here
       }
     }
-    fetchMembers()
-   },[members])
+    fetchMembers()},[])
   const filteredMembers = members.filter(
     member =>
       member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -246,7 +246,7 @@ export function MemberManagement() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleDelete(member._id, member.name)} // <-- use _id here
+                          onClick={() => handleDelete(member._id, member.name)}
                           className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -269,6 +269,14 @@ export function MemberManagement() {
           if (!open) setEditingMember(null);
         }}
         initialValues={editingMember}
+      />
+
+      <DeletePopup
+        open={deletePopup.open}
+        title="Delete Member"
+        message={`Are you sure you want to delete ${deletePopup.memberName}?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeletePopup({ open: false, memberId: null, memberName: "" })}
       />
     </div>
   )

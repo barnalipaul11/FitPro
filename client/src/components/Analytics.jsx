@@ -10,7 +10,8 @@ import {
   BarChart,
   Bar
 } from "recharts"
-
+import { EnrollmentForm } from "./forms/EnrollmentForm"
+import { Button } from "@/components/ui/button"
 const revenueData = [
   { month: "Jan", revenue: 35000, members: 2200 },
   { month: "Feb", revenue: 38000, members: 2350 },
@@ -26,7 +27,7 @@ const membershipData = [
   { type: "VIP", count: 667, percentage: 23 }
 ]
 
-export function Analytics() {
+export function Analytics({ onOpenEnrollment }) {
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200">
@@ -125,7 +126,11 @@ export function Analytics() {
             </ResponsiveContainer>
           </CardContent>
         </Card>
+        <div>
+          <EnrollmentForm />
+        </div>
       </div>
+      <Button onClick={onOpenEnrollment}>Add Enrollment</Button>
     </div>
   )
 }
