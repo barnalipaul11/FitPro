@@ -6,7 +6,6 @@ import {
   BarChart3,
   LayoutDashboard,
   Bell,
-  Menu
 } from "lucide-react";
 import {
   Sidebar,
