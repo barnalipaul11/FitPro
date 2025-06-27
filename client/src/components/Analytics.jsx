@@ -130,7 +130,7 @@ export function Analytics({ onOpenEnrollment }) {
           <EnrollmentForm />
         </div>
       </div>
-      <Button onClick={onOpenEnrollment}>Add Enrollment</Button>
+      <Button onClick={onOpenEnrollment}>Predict Enrollment Forecast</Button>
     </div>
   )
 }

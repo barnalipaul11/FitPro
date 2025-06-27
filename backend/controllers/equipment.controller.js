@@ -102,3 +102,23 @@ export const deleteEquipment = async (req, res) => {
     }
 };
 
+export const getEquipmentById = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const err = handleError(400, "Validation error");
+    return res.status(err.statusCode).json({ message: err.message, errors: errors.array() });
+  }
+
+  try {
+    const { id } = req.params;
+    const equipment = await Equipment.findById(id);
+    if (!equipment) {
+      const err = handleError(404, "Equipment not found");
+      return res.status(err.statusCode).json({ message: err.message });
+    }
+    res.status(200).json(equipment);
+  } catch (error) {
+    const err = handleError(500, "Error fetching equipment by ID");
+    res.status(err.statusCode).json({ message: err.message, error });
+  }
+};

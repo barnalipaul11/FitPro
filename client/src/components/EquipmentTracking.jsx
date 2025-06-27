@@ -16,7 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EquipmentForm } from "@/components/forms/EquipmentForm";
-// import { useToast } from "@/hooks/use-toast"
+import { PredictFailureForm } from "@/components/forms/PredictFailureForm";
+
 import {
   Pagination,
   PaginationContent,
@@ -26,7 +27,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { DeletePopup } from "@/utils/deletepopup"
+import { DeletePopup } from "@/utils/deletepopup";
 
 export function EquipmentTracking() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,8 +35,15 @@ export function EquipmentTracking() {
   const [currentPage, setCurrentPage] = useState(1);
   const [equipment, setEquipment] = useState([]);
   const [editingEquipment, setEditingEquipment] = useState(null);
+  const [predictOpen, setPredictOpen] = useState(false);
+  const [predictEquipment, setPredictEquipment] = useState(null);
+  const [predictResult, setPredictResult] = useState(null);
   const itemsPerPage = 8;
-  const [deletePopup, setDeletePopup] = useState({ open: false, equipmentId: null, equipmentName: "" })
+  const [deletePopup, setDeletePopup] = useState({
+    open: false,
+    equipmentId: null,
+    equipmentName: "",
+  });
   //const { toast } = useToast()
 
   const handleEdit = (equipmentId) => {
@@ -50,10 +58,10 @@ export function EquipmentTracking() {
   };
 
   const handleDelete = (equipmentId, equipmentName) => {
-    console.log("Deleting equipment:", equipmentId);  
+    console.log("Deleting equipment:", equipmentId);
     setDeletePopup({ open: true, equipmentId, equipmentName });
     // toast({})
-    }
+  };
   const confirmDelete = async () => {
     const { equipmentId, equipmentName } = deletePopup;
     try {
@@ -75,11 +83,50 @@ export function EquipmentTracking() {
       //   title: "Error",
       //   description: "Failed to delete equipment"
       // })
-    }
-    finally {
+    } finally {
       setDeletePopup({ open: false, equipmentId: null, equipmentName: "" });
     }
   };
+
+  const handlePredict = async (equipmentId) => {
+    setPredictEquipment(equipmentId);
+    setPredictResult(null); // Reset previous result
+    setPredictOpen(true);
+  };
+
+  const submitPredictForm = async (data) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/predict-failure`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ equipmentId: predictEquipment, ...data }),
+        }
+      );
+      if (!response.ok) throw new Error("Prediction request failed");
+      const result = await response.json();
+      setPredictResult(result);
+      // Optionally show a toast notification here
+    } catch (error) {
+      console.error("Error during prediction:", error);
+      setPredictResult({ error: error.message });
+    }
+  };
+
+  // Show toast or popup for result
+  useEffect(() => {
+    if (predictResult) {
+      alert(
+        predictResult.error
+          ? `Prediction failed: ${predictResult.error}`
+          : `Prediction: ${predictResult.prediction || JSON.stringify(predictResult)}`
+      );
+      setPredictResult(null);
+    }
+  }, [predictResult]);
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -120,7 +167,8 @@ export function EquipmentTracking() {
       }
     };
     fetchEquipment();
-  });
+  }, [isFormOpen]); // Re-fetch when the form is opened
+
   const filteredEquipment = equipment.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -232,7 +280,12 @@ export function EquipmentTracking() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
                       <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span>Last: {item.lastMaintenance}</span>
+                      <span>
+                        Last:{" "}
+                        {item.lastMaintenanceDate
+                          ? new Date(item.lastMaintenanceDate).toLocaleDateString()
+                          : "N/A"}
+                      </span>
                     </div>
                     <div className="flex items-center space-x-2 text-slate-600 dark:text-slate-400">
                       <Clock className="w-4 h-4 flex-shrink-0" />
@@ -260,6 +313,14 @@ export function EquipmentTracking() {
                       className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePredict(item.lastMaintenanceDate)} // <-- use _id here
+                      className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    >
+                      <Settings className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
@@ -337,12 +398,20 @@ export function EquipmentTracking() {
         }}
         initialValues={editingEquipment}
       />
+      <PredictFailureForm
+        open={predictOpen}
+        onOpenChange={setPredictOpen}
+        equipment={predictEquipment}
+        onResult={setPredictResult}
+      />
       <DeletePopup
         open={deletePopup.open}
         title="Delete Equipment"
         message={`Are you sure you want to delete ${deletePopup.equipmentName}?`}
         onConfirm={confirmDelete}
-        onCancel={() => setDeletePopup({ open: false, equipmentId: null, equipmentName: "" })}
+        onCancel={() =>
+          setDeletePopup({ open: false, equipmentId: null, equipmentName: "" })
+        }
       />
     </div>
   );
