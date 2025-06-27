@@ -21,48 +21,45 @@ import { z } from "zod"
 
 
 const enrollmentSchema = z.object({
-  month: z.coerce.number().min(1, "Month is required"),
-  marketing_campaign: z.coerce.number().min(1, "Marketing is required"),
-  enrollments_lag1: z.coerce.number().min(1, "New enrollment is required"),
+  current_month: z.coerce.number().min(1, "Month is required"),
+  marketing_campaign: z.coerce.number().min(0, "Marketing is required"),
+  current_enrollment: z.coerce.number().min(1, "New enrollment is required"),
+  months_to_predict: z.coerce.number().min(1, "Predict month is required")
 })
 
-export function EnrollmentForm({ open, onOpenChange }) {
+export function EnrollmentForm({ open, onOpenChange, onPrediction }) {
   const form = useForm({
     resolver: zodResolver(enrollmentSchema),
     defaultValues: {
-      month: "",
+      current_month: "",
       marketing_campaign: "",
-      enrollments_lag1: "",
+      current_enrollment: "",
+      months_to_predict: "",
     },
   })
 
   const onSubmit = async (data) => {
     try {
-      await fetch(`${import.meta.env.VITE_ML_API_BASE_URL}/enrollment`, {
+      const response = await fetch(`${import.meta.env.VITE_ML_API_BASE_URL}/enrollment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      }).then((response) => {
-        if (!response.ok) { 
-            throw new Error("Network response was not ok")
-        }
-        return response.json()
-        }).then((result) => {
-            console.log("Prediction result:", result)
-            // Handle the prediction result as needed
-            // For example, you could display it in a toast or update the UI        
-            alert(`Prediction: ${result.predicted_enrollment
-}`)
-            // You can also handle the result further, like updating state or showing a message
-
-        }).catch((error) => {
-            console.error("Error fetching prediction:", error)
+      });
+      if (!response.ok) throw new Error("Network response was not ok");
+      const result = await response.json();
+     
+      // Pass both input and prediction to parent
+      if (onPrediction) {
+        onPrediction({
+          ...data,
+          predicted_enrollment: result.predicted_new_enrollment,
         });
-      // Reset form and close dialog after successful submission
-      onOpenChange(false)
-      form.reset()
+      }
+
+      onOpenChange(false);
+      form.reset();
     } catch (error) {
-      console.error("Error submitting form:", error)
+      console.error("Error submitting form:", error);
     }
   }
 
@@ -70,16 +67,16 @@ export function EnrollmentForm({ open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Enrollment</DialogTitle>
+          <DialogTitle>Forecasting New Customer</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
-              name="month"
+              name="current_month"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Month</FormLabel>
+                  <FormLabel>Current Month</FormLabel>
                   <FormControl>
                     <Input {...field} type="number" placeholder="Enter month (1-12)" />
                   </FormControl>
@@ -92,7 +89,7 @@ export function EnrollmentForm({ open, onOpenChange }) {
               name="marketing_campaign"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Marketing Campaign (YES(1)/ NO(0)) (ID)</FormLabel>
+                  <FormLabel>Marketing Campaign</FormLabel>
                   <FormControl>
                     <Input {...field} type="number" placeholder="Enter marketing source ID" />
                   </FormControl>
@@ -102,10 +99,10 @@ export function EnrollmentForm({ open, onOpenChange }) {
             />
             <FormField
               control={form.control}
-              name="enrollments_lag1"
+              name="current_enrollment"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Enrollments</FormLabel>
+                  <FormLabel>Current Enrollment</FormLabel>
                   <Input
                     type="number"
                     {...field}
@@ -115,7 +112,22 @@ export function EnrollmentForm({ open, onOpenChange }) {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-4">
+            <FormField
+              control={form.control}
+              name="months_to_predict"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Month To Predict</FormLabel>
+                  <Input
+                    type="number"
+                    {...field}
+                    placeholder="Enter months to predict (1-12)"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="mt-4 w-full">
               Prediction
             </Button>
           </form>
