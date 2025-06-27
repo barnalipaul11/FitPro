@@ -24,7 +24,7 @@ const Notifications = () => {
                         />
                         <div className="p-6">
                             <NotificationsPanel />
-                        </div>
+                        </div> 
                     </main>
                 </div>
             </SidebarProvider>

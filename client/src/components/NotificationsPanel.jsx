@@ -1,49 +1,59 @@
 import { useEffect, useState } from "react"
-import { Bell, AlertTriangle, Clock, DollarSign, Wrench } from "lucide-react"
+import { Bell, Clock } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-const iconMap = {
-  membership: Clock,
-  equipment: Wrench,
-  payment: DollarSign,
-  general: Bell,
-  alert: AlertTriangle
+function getDueDate(startDate, type) {
+  if (!startDate) return ""
+  const date = new Date(startDate)
+  switch (type?.toLowerCase()) {
+    case "basic":
+      date.setMonth(date.getMonth() + 1)
+      break
+    case "silver":
+      date.setMonth(date.getMonth() + 3)
+      break
+    case "gold":
+      date.setMonth(date.getMonth() + 6)
+      break
+    case "platinum":
+      date.setFullYear(date.getFullYear() + 1)
+      break
+    default:
+      return ""
+  }
+  return date
+}
+
+function getDaysLeft(expiryDate) {
+  if (!expiryDate) return ""
+  const now = new Date()
+  const diff = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24))
+  if (diff < 0) return "Expired"
+  if (diff === 0) return "Expires today"
+  return `${diff} day${diff > 1 ? "s" : ""} left`
 }
 
 export function NotificationsPanel() {
-  const [notifications, setNotifications] = useState([])
+  const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const getPriorityColor = priority => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-      case "low":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
-    }
-  }
-
   useEffect(() => {
-    const fetchNotifications = async () => {
+    const fetchMembers = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_BASE_URL}/notifications`
+          `${import.meta.env.VITE_API_BASE_URL}/members`
         )
-        if (!response.ok) throw new Error("Failed to fetch notifications")
+        if (!response.ok) throw new Error("Failed to fetch members")
         const data = await response.json()
-        setNotifications(data)
+        setMembers(data)
       } catch (error) {
-        console.error("Error fetching notifications:", error)
+        console.error("Error fetching members:", error)
       } finally {
         setLoading(false)
       }
     }
-    fetchNotifications()
+    fetchMembers()
   }, [])
 
   return (
@@ -52,10 +62,10 @@ export function NotificationsPanel() {
         <CardTitle className="flex items-center space-x-2">
           <Bell className="w-5 h-5 text-slate-600 dark:text-slate-400" />
           <span className="text-xl font-semibold text-slate-800 dark:text-slate-200">
-            Notifications
+            All Members
           </span>
-          <Badge className="bg-red-500 text-white">
-            {notifications.filter(n => n.priority === "high").length}
+          <Badge className="bg-blue-500 text-white">
+            {members.length}
           </Badge>
         </CardTitle>
       </CardHeader>
@@ -63,33 +73,36 @@ export function NotificationsPanel() {
         <div className="space-y-4">
           {loading ? (
             <div className="text-center text-slate-500">Loading...</div>
-          ) : notifications.length === 0 ? (
-            <div className="text-center text-slate-500">No notifications</div>
+          ) : members.length === 0 ? (
+            <div className="text-center text-slate-500">
+              No members found
+            </div>
           ) : (
-            notifications.map(notification => {
-              const Icon = iconMap[notification.type] || Bell
+            members.map(member => {
+              const expiryDate = getDueDate(member.membershipStartDate, member.membershipType)
               return (
                 <div
-                  key={notification._id}
-                  className="flex items-start space-x-3 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                  key={member._id}
+                  className="flex items-start space-x-3 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                 >
                   <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-5 h-5 text-white" />
+                    <Clock className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="font-medium text-slate-800 dark:text-slate-200 truncate">
-                        {notification.title}
+                        {member.name}
                       </h4>
-                      <Badge className={getPriorityColor(notification.priority)}>
-                        {notification.priority}
+                      <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                        {member.membershipType || "Package"}
                       </Badge>
                     </div>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                      {notification.message}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-500">
-                      {new Date(notification.createdAt).toLocaleString()}
+                      Expires on:{" "}
+                      {expiryDate ? expiryDate.toLocaleDateString() : "N/A"}{" "}
+                      <span className="ml-2 font-semibold">
+                        {getDaysLeft(expiryDate)}
+                      </span>
                     </p>
                   </div>
                 </div>
