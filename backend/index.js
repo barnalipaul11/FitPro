@@ -38,7 +38,7 @@ app.listen(PORT, () => {
 app.use('/api/members', MemberRoute)
 app.use('/api/staff', staffRoutes); 
 app.use('/api/equipment', EquipmentRoutes);
-
+app.use('/api/admin', adminRouter);
 
 app.use((err, req, res, next) => { 
     console.error(err.stack);
