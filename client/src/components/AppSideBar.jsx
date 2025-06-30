@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
-
+import { Button } from "@/components/ui/button"
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, key: "/" },
   { title: "Members", icon: Users, key: "/member" },
@@ -35,8 +35,10 @@ export function AppSidebar({ activeTab, setActiveTab }) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
-
-  // Sidebar content for desktop
+  const handleLogout = () => {
+    localStorage.removeItem("token"); 
+    navigate("/login");
+  }
   const sidebarContent = (
     <>
       <SidebarHeader className="p-6">
@@ -87,19 +89,12 @@ export function AppSidebar({ activeTab, setActiveTab }) {
             <span className="text-white text-sm font-semibold">A</span>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-slate-800 dark:text-slate-200">
-              Admin User
-            </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              admin@gym.com
-            </p>
+           <Button onClick={handleLogout}> LogOut </Button>
           </div>
         </div>
       </SidebarFooter>
     </>
   );
-
-  // Mobile: show vertical sidebar at left with only icons
   if (isMobile) {
     return (
       <aside className="fixed top-0 left-0 h-full w-16 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 flex flex-col items-center py-4 z-50">
