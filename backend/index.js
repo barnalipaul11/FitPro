@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import staffRoutes from './routes/Staff.route.js';
 import MemberRoute from './routes/member.route.js'
 import EquipmentRoutes from './routes/Equipment.route.js';
+import adminRouter from './routes/Admin.route.js';
 
 dotenv.config({
     path : ".env"

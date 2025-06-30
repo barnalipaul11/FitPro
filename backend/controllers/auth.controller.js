@@ -49,9 +49,14 @@ export const login = async (req, res) => {
         if (!admin) {
             return handleError(res, 404, 'Admin not found');
         }
-
+        console.log(admin);
+        
         const isMatch = await bcrypt.compare(password, admin.password);
+        console.log(isMatch);
+        
         if (!isMatch) {
+            console.log('Invalid credentials');
+            
             return handleError(res, 400, 'Invalid credentials');
         }
 
@@ -65,6 +70,7 @@ export const login = async (req, res) => {
 
         return res.status(200).json({
             success: true,
+            token,
             message: 'Login successful',
             admin: {
                 _id: admin._id,

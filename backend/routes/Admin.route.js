@@ -1,5 +1,5 @@
 import express from 'express';
-import { singUp, login, logout } from '../controllers/Admin.controller.js';
+import { singUp, login, logout } from '../controllers/auth.controller.js';
 
 const adminRouter = express.Router();
 
